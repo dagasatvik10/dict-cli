@@ -1,1 +1,8 @@
+#DEPENDENCIES
 node_modules/
+
+#EDITORS
+.vscode/
+
+#ENVIRONMENTS(not adding as this is demo project)
+# .env
