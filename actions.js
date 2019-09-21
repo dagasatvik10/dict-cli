@@ -54,3 +54,19 @@ exports.antAction = async word => {
     logger.error(err);
   }
 };
+
+exports.exAction = async word => {
+  const spinner = ora('Loading Examples').start();
+  try {
+    const result = await getExamples(word);
+    spinner.stop();
+    if (result && result.examples) {
+      result.examples.forEach(e => {
+        logger.success(e.text);
+      });
+    }
+  } catch (err) {
+    spinner.stop();
+    logger.error(err);
+  }
+};
