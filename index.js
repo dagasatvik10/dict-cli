@@ -3,7 +3,7 @@
 // load environment variables
 require('dotenv').config();
 const com = require('commander');
-const { defAction, synAction } = require('./actions');
+const { defAction, synAction, antAction } = require('./actions');
 
 com
   .version('1.0.0')
@@ -17,6 +17,13 @@ com
   .command('syn <word>')
   .action(async word => {
     synAction(word);
+  });
+
+com
+  .version('1.0.0')
+  .command('ant <word>')
+  .action(async word => {
+    antAction(word);
   });
 
 com.parse(process.argv);

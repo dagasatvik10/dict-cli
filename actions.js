@@ -35,3 +35,22 @@ exports.synAction = async word => {
     logger.error(err);
   }
 };
+
+exports.antAction = async word => {
+  const spinner = ora('Loading Antonyms').start();
+  try {
+    const result = await getRelatedWords(word);
+    spinner.stop();
+    const parsedResult = parseRelatedWordsResponse(result);
+    if (parsedResult && parsedResult.antonym && parsedResult.antonym.length) {
+      parsedResult.antonym.forEach(s => {
+        logger.success(s);
+      });
+    } else {
+      logger.error(`No synonyms for ${word}`);
+    }
+  } catch (err) {
+    spinner.stop();
+    logger.error(err);
+  }
+};
