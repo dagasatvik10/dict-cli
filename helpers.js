@@ -1,4 +1,5 @@
 const logger = require('./logger');
+const Promise = require('bluebird');
 const { getDefinitions, getExamples, getRelatedWords } = require('./services');
 
 const parseRelatedWordsResponse = data => {
@@ -85,4 +86,20 @@ exports.displayEx = async (word, examples) => {
   } else {
     throw new Error(`No examples for ${word}`);
   }
+};
+
+exports.displayAll = async word => {
+  const [definitions, examples, relatedWords] = await Promise.all([
+    getDefinitions(word),
+    getExamples(word),
+    getRelatedWords(word),
+  ]);
+
+  this.displayData(this.displayDef, [word, definitions]);
+
+  this.displayData(this.displayEx, [word, examples]);
+
+  this.displayData(this.displayAnt, [word, relatedWords]);
+
+  this.displayData(this.displaySyn, [word, relatedWords]);
 };

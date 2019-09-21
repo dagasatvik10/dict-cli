@@ -1,4 +1,4 @@
-const { displayData, displayDef, displaySyn, displayAnt, displayEx } = require('./helpers');
+const { displayData, displayDef, displaySyn, displayAnt, displayEx, displayAll } = require('./helpers');
 const { getRandomWord } = require('./services');
 
 exports.defAction = async word => {
@@ -15,4 +15,8 @@ exports.antAction = async word => {
 
 exports.exAction = async word => {
   displayData(displayEx, word);
+};
+
+exports.allAction = async word => {
+  displayData(displayAll, word);
 };
