@@ -1,8 +1,12 @@
 const axios = require('axios').default;
+const ora = require('ora');
 const url = require('url');
 
 const getRequest = apiURL => {
-  return axios.get(`${apiURL}?api_key=${process.env.API_KEY}`);
+  const spinner = ora('Loading!').start();
+  return axios.get(`${apiURL}?api_key=${process.env.API_KEY}`).finally(() => {
+    spinner.stop();
+  });
 };
 
 exports.getRandomWord = async () => {
