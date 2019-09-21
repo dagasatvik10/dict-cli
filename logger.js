@@ -13,3 +13,7 @@ exports.error = msg => {
 exports.warn = msg => {
   log(chalk.yellow(msg));
 };
+
+exports.info = msg => {
+  log(msg);
+};
