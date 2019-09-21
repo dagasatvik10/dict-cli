@@ -15,56 +15,73 @@ const parseRelatedWordsResponse = data => {
 exports.displayData = async (displayFn, params) => {
   try {
     if (params) {
-      await displayFn(params);
+      if (Array.isArray(params)) {
+        await displayFn(...params);
+      } else {
+        await displayFn(params);
+      }
     } else {
-      displayFn();
+      await displayFn();
     }
   } catch (err) {
-    logger.error(err);
+    if (err.message) {
+      logger.error(err.message);
+    } else {
+      logger.error(err);
+    }
+    logger.info('\n');
   }
 };
 
-exports.displayDef = async word => {
-  const result = await getDefinitions(word);
-  if (result && result.length) {
+exports.displayDef = async (word, definitions) => {
+  const result = definitions || (await getDefinitions(word));
+  if (result && result.length > 0) {
+    logger.info('Definitions');
     result.forEach(defs => {
       logger.success(defs.text);
     });
+    logger.info('\n');
   } else {
     throw new Error(`No definitions for ${word}`);
   }
 };
 
-exports.displaySyn = async word => {
-  const result = await getRelatedWords(word);
+exports.displaySyn = async (word, relatedWords) => {
+  const result = relatedWords || (await getRelatedWords(word));
   const parsedResult = parseRelatedWordsResponse(result);
-  if (parsedResult && parsedResult.synonym && parsedResult.synonym.length) {
+  if (parsedResult && parsedResult.synonym && parsedResult.synonym.length > 0) {
+    logger.info('Synonyms');
     parsedResult.synonym.forEach(s => {
       logger.success(s);
     });
+    logger.info('\n');
   } else {
     throw new Error(`No synonyms for ${word}`);
   }
 };
 
-exports.displayAnt = async word => {
-  const result = await getRelatedWords(word);
+exports.displayAnt = async (word, relatedWords) => {
+  const result = relatedWords || (await getRelatedWords(word));
   const parsedResult = parseRelatedWordsResponse(result);
-  if (parsedResult && parsedResult.antonym && parsedResult.antonym.length) {
+  if (parsedResult && parsedResult.antonym && parsedResult.antonym.length > 0) {
+    logger.info('Antonyms');
     parsedResult.antonym.forEach(s => {
       logger.success(s);
     });
+    logger.info('\n');
   } else {
     throw new Error(`No antonyms for ${word}`);
   }
 };
 
-exports.displayEx = async word => {
-  const result = await getExamples(word);
-  if (result && result.examples) {
+exports.displayEx = async (word, examples) => {
+  const result = examples || (await getExamples(word));
+  if (result && result.examples && result.examples.length > 0) {
+    logger.info('Examples');
     result.examples.forEach(e => {
       logger.success(e.text);
     });
+    logger.info('\n');
   } else {
     throw new Error(`No examples for ${word}`);
   }
