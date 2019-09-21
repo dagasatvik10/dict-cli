@@ -1,6 +1,7 @@
+const chalk = require('chalk');
 const logger = require('./logger');
 const Promise = require('bluebird');
-const { getDefinitions, getExamples, getRelatedWords } = require('./services');
+const { getDefinitions, getExamples, getRelatedWords, getRandomWord } = require('./services');
 
 const parseRelatedWordsResponse = data => {
   if (data && data.length) {
@@ -102,4 +103,21 @@ exports.displayAll = async word => {
   this.displayData(this.displayAnt, [word, relatedWords]);
 
   this.displayData(this.displaySyn, [word, relatedWords]);
+};
+
+exports.displayWordOfDay = async () => {
+  try {
+    const result = await getRandomWord();
+    logger.info('Word Of The Day');
+    logger.info(chalk.bold.greenBright(result.word.toUpperCase()));
+    logger.info('\n');
+    await this.displayAll(result.word);
+  } catch (err) {
+    if (err.message) {
+      logger.error(err.message);
+    } else {
+      logger.error(err);
+    }
+    logger.info('\n');
+  }
 };
