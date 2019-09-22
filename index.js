@@ -3,7 +3,7 @@
 // load environment variables
 require('dotenv').config();
 const com = require('commander');
-const { defAction, synAction, antAction, exAction, allAction, wordOfDayAction } = require('./actions');
+const { defAction, synAction, antAction, exAction, allAction, wordOfDayAction, playAction } = require('./actions');
 
 let runWordOfDay = true;
 
@@ -46,6 +46,14 @@ com
   .description('All information about the word')
   .action(async word => {
     allAction(word);
+    runWordOfDay = false;
+  });
+
+com
+  .command('play')
+  .description('A dictionary game - Game-A-Dict')
+  .action(async () => {
+    playAction();
     runWordOfDay = false;
   });
 

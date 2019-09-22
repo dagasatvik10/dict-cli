@@ -6,6 +6,7 @@ const {
   displayEx,
   displayAll,
   displayWordOfDay,
+  displayGame,
 } = require('./helpers');
 
 exports.defAction = async word => {
@@ -29,5 +30,9 @@ exports.allAction = async word => {
 };
 
 exports.wordOfDayAction = async () => {
-  await displayWordOfDay();
+  displayWordOfDay();
+};
+
+exports.playAction = async () => {
+  displayGame();
 };
