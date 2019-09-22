@@ -134,20 +134,11 @@ exports.displayAll = async word => {
 };
 
 exports.displayWordOfDay = async () => {
-  try {
-    const result = await getRandomWord();
-    logger.info('Word Of The Day');
-    logger.info(chalk.bold.greenBright(result.word.toUpperCase()));
-    logger.info('\n');
-    await this.displayAll(result.word);
-  } catch (err) {
-    if (err.message) {
-      logger.error(err.message);
-    } else {
-      logger.error(err);
-    }
-    logger.info('\n');
-  }
+  const result = await getRandomWord();
+  logger.info('Word Of The Day');
+  logger.info(chalk.bold.greenBright(result.word.toUpperCase()));
+  logger.info('\n');
+  await this.displayAll(result.word);
 };
 
 // jumble the given word
@@ -240,19 +231,10 @@ const checkAnswer = (answer, word, synonymsLeft) => {
 };
 
 exports.displayGame = async () => {
-  try {
-    const { word } = await getRandomWord();
-    const apiResponses = await Promise.all([getDefinitions(word), getExamples(word), getRelatedWords(word)]);
-    const wordInfo = parseAllResponses(apiResponses);
-    logger.info(`Welcome to Game-A-Dict. Let's play`);
-    logger.info('Please guess the word from the information.\n');
-    askQuestion(word, wordInfo);
-  } catch (err) {
-    if (err.message) {
-      logger.error(err.message);
-    } else {
-      logger.error(err);
-    }
-    logger.info('\n');
-  }
+  const { word } = await getRandomWord();
+  const apiResponses = await Promise.all([getDefinitions(word), getExamples(word), getRelatedWords(word)]);
+  const wordInfo = parseAllResponses(apiResponses);
+  logger.info(`Welcome to Game-A-Dict. Let's play`);
+  logger.info('Please guess the word from the information.\n');
+  askQuestion(word, wordInfo);
 };

@@ -30,9 +30,9 @@ exports.allAction = async word => {
 };
 
 exports.wordOfDayAction = async () => {
-  displayWordOfDay();
+  displayData(displayWordOfDay);
 };
 
 exports.playAction = async () => {
-  displayGame();
+  displayData(displayGame);
 };
