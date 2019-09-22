@@ -2,11 +2,20 @@ const axios = require('axios').default;
 const ora = require('ora');
 const url = require('url');
 
-const getRequest = apiURL => {
+const getRequest = async apiURL => {
   const spinner = ora('Loading!').start();
-  return axios.get(`${apiURL}?api_key=${process.env.API_KEY}`).finally(() => {
+  try {
+    const result = await axios.get(`${apiURL}?api_key=${process.env.API_KEY}`);
     spinner.stop();
-  });
+    return result;
+  } catch (err) {
+    spinner.stop();
+    if (err.message.includes(400)) {
+      throw new Error('No data available');
+    } else {
+      throw err;
+    }
+  }
 };
 
 exports.getRandomWord = async () => {
