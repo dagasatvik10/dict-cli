@@ -4,7 +4,7 @@ const Promise = require('bluebird');
 const inquirer = require('inquirer');
 const { getDefinitions, getExamples, getRelatedWords, getRandomWord } = require('./services');
 
-const parseRelatedWordsResponse = data => {
+const parseRelatedWordsResponse = (data) => {
   let result = { antonym: [], synonym: [] };
   if (data && data.length) {
     result = data.reduce((acc, v) => {
@@ -16,21 +16,21 @@ const parseRelatedWordsResponse = data => {
   return result;
 };
 
-const parseDefinitionsResponse = data => {
+const parseDefinitionsResponse = (data) => {
   if (data && data.length) {
-    return data.map(d => d.text);
+    return data.map((d) => d.text);
   }
   return [];
 };
 
-const parseExamplesResponse = data => {
+const parseExamplesResponse = (data) => {
   if (data && data.examples && data.examples.length) {
-    return data.examples.map(e => e.text);
+    return data.examples.map((e) => e.text);
   }
   return [];
 };
 
-const parseAllResponses = responses => {
+const parseAllResponses = (responses) => {
   const [definitionsRes, examplesRes, relatedWordsRes] = responses;
   const relatedWords = parseRelatedWordsResponse(relatedWordsRes);
 
@@ -67,7 +67,7 @@ exports.displayDef = async (word, definitions) => {
   const result = definitions || (await getDefinitions(word));
   if (result && result.length > 0) {
     logger.info('Definitions');
-    result.forEach(defs => {
+    result.forEach((defs) => {
       logger.success(defs.text);
     });
     logger.info('\n');
@@ -81,7 +81,7 @@ exports.displaySyn = async (word, relatedWords) => {
   const parsedResult = parseRelatedWordsResponse(result);
   if (parsedResult && parsedResult.synonym && parsedResult.synonym.length > 0) {
     logger.info('Synonyms');
-    parsedResult.synonym.forEach(s => {
+    parsedResult.synonym.forEach((s) => {
       logger.success(s);
     });
     logger.info('\n');
@@ -95,7 +95,7 @@ exports.displayAnt = async (word, relatedWords) => {
   const parsedResult = parseRelatedWordsResponse(result);
   if (parsedResult && parsedResult.antonym && parsedResult.antonym.length > 0) {
     logger.info('Antonyms');
-    parsedResult.antonym.forEach(s => {
+    parsedResult.antonym.forEach((s) => {
       logger.success(s);
     });
     logger.info('\n');
@@ -108,7 +108,7 @@ exports.displayEx = async (word, examples) => {
   const result = examples || (await getExamples(word));
   if (result && result.examples && result.examples.length > 0) {
     logger.info('Examples');
-    result.examples.forEach(e => {
+    result.examples.forEach((e) => {
       logger.success(e.text);
     });
     logger.info('\n');
@@ -117,7 +117,7 @@ exports.displayEx = async (word, examples) => {
   }
 };
 
-exports.displayAll = async word => {
+exports.displayAll = async (word) => {
   const [definitions, examples, relatedWords] = await Promise.all([
     getDefinitions(word),
     getExamples(word),
@@ -138,11 +138,11 @@ exports.displayWordOfDay = async () => {
   logger.info('Word Of The Day');
   logger.info(chalk.bold.greenBright(result.word.toUpperCase()));
   logger.info('\n');
-  await this.displayAll(result.word);
+  // await this.displayAll(result.word);
 };
 
 // jumble the given word
-const jumbleWord = word => {
+const jumbleWord = (word) => {
   const jumbledWordArr = word.split('');
   for (var i = jumbledWordArr.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
@@ -193,7 +193,11 @@ const wrongAnswerAction = async (word, wordInfo) => {
       type: 'list',
       name: 'selection',
       message: 'What do you want to do?',
-      choices: [{ name: '1: Try again', value: 1 }, { name: '2: Hint', value: 2 }, { name: '3: Quit', value: 3 }],
+      choices: [
+        { name: '1: Try again', value: 1 },
+        { name: '2: Hint', value: 2 },
+        { name: '3: Quit', value: 3 },
+      ],
     },
   ]);
   switch (answer.selection) {
