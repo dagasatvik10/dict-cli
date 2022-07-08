@@ -67,9 +67,11 @@ exports.displayDef = async (word, definitions) => {
   const result = definitions || (await getDefinitions(word));
   if (result && result.length > 0) {
     logger.info('Definitions');
-    result.forEach((defs) => {
-      logger.success(defs.text);
-    });
+    result
+      .filter((defs) => defs.text)
+      .forEach((defs) => {
+        logger.success(defs.text);
+      });
     logger.info('\n');
   } else {
     throw new Error(`No definitions for ${word}`);
