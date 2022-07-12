@@ -9,23 +9,23 @@ const {
   displayGame,
 } = require('./helpers');
 
-exports.defAction = async word => {
+exports.defAction = async (word) => {
   displayData(displayDef, word);
 };
 
-exports.synAction = async word => {
+exports.synAction = async (word) => {
   displayData(displaySyn, word);
 };
 
-exports.antAction = async word => {
+exports.antAction = async (word) => {
   displayData(displayAnt, word);
 };
 
-exports.exAction = async word => {
+exports.exAction = async (word) => {
   displayData(displayEx, word);
 };
 
-exports.allAction = async word => {
+exports.allAction = async (word) => {
   displayData(displayAll, word);
 };
 

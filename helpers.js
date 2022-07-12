@@ -1,10 +1,9 @@
 const chalk = require('chalk');
 const logger = require('./logger');
-const Promise = require('bluebird');
 const inquirer = require('inquirer');
 const { getDefinitions, getExamples, getRelatedWords, getRandomWord } = require('./services');
 
-const parseRelatedWordsResponse = data => {
+const parseRelatedWordsResponse = (data) => {
   let result = { antonym: [], synonym: [] };
   if (data && data.length) {
     result = data.reduce((acc, v) => {
@@ -16,21 +15,21 @@ const parseRelatedWordsResponse = data => {
   return result;
 };
 
-const parseDefinitionsResponse = data => {
+const parseDefinitionsResponse = (data) => {
   if (data && data.length) {
-    return data.map(d => d.text);
+    return data.filter((d) => d.text).map((d) => d.text);
   }
   return [];
 };
 
-const parseExamplesResponse = data => {
+const parseExamplesResponse = (data) => {
   if (data && data.examples && data.examples.length) {
-    return data.examples.map(e => e.text);
+    return data.examples.map((e) => e.text);
   }
   return [];
 };
 
-const parseAllResponses = responses => {
+const parseAllResponses = (responses) => {
   const [definitionsRes, examplesRes, relatedWordsRes] = responses;
   const relatedWords = parseRelatedWordsResponse(relatedWordsRes);
 
@@ -64,73 +63,95 @@ exports.displayData = async (displayFn, params) => {
 };
 
 exports.displayDef = async (word, definitions) => {
-  const result = definitions || (await getDefinitions(word));
-  if (result && result.length > 0) {
-    logger.info('Definitions');
-    result.forEach(defs => {
-      logger.success(defs.text);
-    });
-    logger.info('\n');
-  } else {
+  try {
+    const result = definitions || (await getDefinitions(word));
+    if (result && result.length > 0) {
+      logger.info('Definitions');
+      result
+        .filter((defs) => defs.text)
+        .forEach((defs) => {
+          logger.success(defs.text);
+        });
+      logger.info('\n');
+    } else {
+      throw new Error();
+    }
+  } catch (error) {
     throw new Error(`No definitions for ${word}`);
   }
 };
 
 exports.displaySyn = async (word, relatedWords) => {
-  const result = relatedWords || (await getRelatedWords(word));
-  const parsedResult = parseRelatedWordsResponse(result);
-  if (parsedResult && parsedResult.synonym && parsedResult.synonym.length > 0) {
-    logger.info('Synonyms');
-    parsedResult.synonym.forEach(s => {
-      logger.success(s);
-    });
-    logger.info('\n');
-  } else {
+  try {
+    const result = relatedWords || (await getRelatedWords(word, 'synonym'));
+    if (result && result.length > 0) {
+      logger.info('Synonyms');
+      result[0].words.forEach((synonym) => {
+        logger.success(synonym);
+      });
+      logger.info('\n');
+    } else {
+      throw new Error();
+    }
+  } catch (error) {
     throw new Error(`No synonyms for ${word}`);
   }
 };
 
 exports.displayAnt = async (word, relatedWords) => {
-  const result = relatedWords || (await getRelatedWords(word));
-  const parsedResult = parseRelatedWordsResponse(result);
-  if (parsedResult && parsedResult.antonym && parsedResult.antonym.length > 0) {
-    logger.info('Antonyms');
-    parsedResult.antonym.forEach(s => {
-      logger.success(s);
-    });
-    logger.info('\n');
-  } else {
+  try {
+    const result = relatedWords || (await getRelatedWords(word, 'antonym'));
+    if (result && result.length > 0) {
+      logger.info('Antonyms');
+      result[0].words.forEach((antonym) => {
+        logger.success(antonym);
+      });
+      logger.info('\n');
+    } else {
+      throw new Error();
+    }
+  } catch (error) {
     throw new Error(`No antonyms for ${word}`);
   }
 };
 
 exports.displayEx = async (word, examples) => {
-  const result = examples || (await getExamples(word));
-  if (result && result.examples && result.examples.length > 0) {
-    logger.info('Examples');
-    result.examples.forEach(e => {
-      logger.success(e.text);
-    });
-    logger.info('\n');
-  } else {
+  try {
+    const result = examples || (await getExamples(word));
+    if (result && result.examples && result.examples.length > 0) {
+      logger.info('Examples');
+      result.examples.forEach((e) => {
+        logger.success(e.text);
+      });
+      logger.info('\n');
+    } else {
+      throw new Error();
+    }
+  } catch (error) {
     throw new Error(`No examples for ${word}`);
   }
 };
 
-exports.displayAll = async word => {
-  const [definitions, examples, relatedWords] = await Promise.all([
-    getDefinitions(word),
+exports.displayAll = async (word) => {
+  const [definitions, examples, relatedWords] = await Promise.allSettled([
+    getDefinitions(word, 5),
     getExamples(word),
-    getRelatedWords(word),
+    getRelatedWords(word, 'synonym,antonym'),
   ]);
 
-  this.displayData(this.displayDef, [word, definitions]);
+  if (definitions.status === 'fulfilled') {
+    this.displayData(this.displayDef, [word, definitions.value]);
+  }
+  if (examples.status === 'fulfilled') {
+    this.displayData(this.displayEx, [word, examples.value]);
+  }
+  if (relatedWords.status === 'fulfilled') {
+    // filter out antonyms
+    this.displayData(this.displayAnt, [word, relatedWords.value.filter((rw) => rw.relationshipType === 'antonym')]);
 
-  this.displayData(this.displayEx, [word, examples]);
-
-  this.displayData(this.displayAnt, [word, relatedWords]);
-
-  this.displayData(this.displaySyn, [word, relatedWords]);
+    // filter out synonyms
+    this.displayData(this.displaySyn, [word, relatedWords.value.filter((rw) => rw.relationshipType === 'synonym')]);
+  }
 };
 
 exports.displayWordOfDay = async () => {
@@ -142,7 +163,7 @@ exports.displayWordOfDay = async () => {
 };
 
 // jumble the given word
-const jumbleWord = word => {
+const jumbleWord = (word) => {
   const jumbledWordArr = word.split('');
   for (var i = jumbledWordArr.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
@@ -193,7 +214,11 @@ const wrongAnswerAction = async (word, wordInfo) => {
       type: 'list',
       name: 'selection',
       message: 'What do you want to do?',
-      choices: [{ name: '1: Try again', value: 1 }, { name: '2: Hint', value: 2 }, { name: '3: Quit', value: 3 }],
+      choices: [
+        { name: '1: Try again', value: 1 },
+        { name: '2: Hint', value: 2 },
+        { name: '3: Quit', value: 3 },
+      ],
     },
   ]);
   switch (answer.selection) {

@@ -12,7 +12,7 @@ com.version('1.0.0');
 com
   .command('def <word>')
   .description('Definitions of the word')
-  .action(async word => {
+  .action(async (word) => {
     defAction(word);
     runWordOfDay = false;
   });
@@ -20,7 +20,7 @@ com
 com
   .command('syn <word>')
   .description('Synonyms of the word')
-  .action(async word => {
+  .action(async (word) => {
     synAction(word);
     runWordOfDay = false;
   });
@@ -28,7 +28,7 @@ com
 com
   .command('ant <word>')
   .description('Antonyms of the word')
-  .action(async word => {
+  .action(async (word) => {
     antAction(word);
     runWordOfDay = false;
   });
@@ -36,7 +36,7 @@ com
 com
   .command('ex <word>')
   .description('Examples of the word')
-  .action(async word => {
+  .action(async (word) => {
     exAction(word);
     runWordOfDay = false;
   });
@@ -44,7 +44,7 @@ com
 com
   .command('dict <word>')
   .description('All information about the word')
-  .action(async word => {
+  .action(async (word) => {
     allAction(word);
     runWordOfDay = false;
   });
